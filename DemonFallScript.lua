@@ -1,26 +1,18 @@
-local function onItemDrop(item)
-    -- عدد العناصر التي تريد إنشاؤها عند الرمي
-    local amount = 1000
-
-    for i = 1, amount do
-        -- إنشاء نسخة جديدة من العنصر
-        local newItem = item:Clone()
-        newItem.Parent = workspace
-
-        -- وضع العنصر في مكان عشوائي بالقرب من مكان الرمي
-        newItem.Position = item.Position + Vector3.new(math.random(-5, 5), 0, math.random(-5, 5))
+-- استمع لحدث إسقاط العناصر من الحقيبة
+game.Players.LocalPlayer.Backpack.ChildRemoved:Connect(function(item)
+    -- تحقق إذا كان العنصر قد أُسقط
+    if not item:IsDescendantOf(game.Players.LocalPlayer.Backpack) then
+        return
     end
+    
+    -- اسم العنصر المُزال
+    local itemName = item.Name
+    local itemPosition = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
 
-    -- حذف العنصر الأصلي
-    item:Destroy()
-end
-
--- ربط الدالة مع حدث الرمي
-game.Players.LocalPlayer.Backpack.ChildAdded:Connect(function(child)
-    if child:IsA("Tool") then
-        child.Activated:Connect(function()
-            -- استدعاء الدالة عند تفعيل الأداة
-            onItemDrop(child)
-        end)
+    -- تكثير العنصر إلى 1000 ووضعهم في مكان العنصر المُسقط
+    for i = 1, 1000 do
+        local clonedItem = item:Clone()
+        clonedItem.Parent = workspace
+        clonedItem.Position = itemPosition + Vector3.new(math.random(-5, 5), 0, math.random(-5, 5))
     end
 end)
