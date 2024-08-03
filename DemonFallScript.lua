@@ -6,6 +6,8 @@ function CustomLib:CreateWindow(title)
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
     local Title = Instance.new("TextLabel")
+    local TabButtonsFrame = Instance.new("Frame")
+    local TabContentFrame = Instance.new("Frame")
 
     ScreenGui.Name = "CustomGUI"
     ScreenGui.Parent = game.CoreGui
@@ -29,10 +31,24 @@ function CustomLib:CreateWindow(title)
     Title.TextSize = 14
     Title.TextWrapped = true
 
+    TabButtonsFrame.Name = "TabButtonsFrame"
+    TabButtonsFrame.Parent = MainFrame
+    TabButtonsFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    TabButtonsFrame.Size = UDim2.new(1, 0, 0.1, 0)
+    TabButtonsFrame.Position = UDim2.new(0, 0, 0.1, 0)
+
+    TabContentFrame.Name = "TabContentFrame"
+    TabContentFrame.Parent = MainFrame
+    TabContentFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    TabContentFrame.Size = UDim2.new(1, 0, 0.8, 0)
+    TabContentFrame.Position = UDim2.new(0, 0, 0.2, 0)
+
     local window = {}
     setmetatable(window, CustomLib)
     window.ScreenGui = ScreenGui
     window.MainFrame = MainFrame
+    window.TabButtonsFrame = TabButtonsFrame
+    window.TabContentFrame = TabContentFrame
     window.Tabs = {}
     return window
 end
@@ -40,10 +56,10 @@ end
 function CustomLib:NewTab(tabName)
     local TabButton = Instance.new("TextButton")
     TabButton.Name = tabName .. "TabButton"
-    TabButton.Parent = self.MainFrame
+    TabButton.Parent = self.TabButtonsFrame
     TabButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-    TabButton.Size = UDim2.new(0.2, 0, 0.1, 0)
-    TabButton.Position = UDim2.new(0, (#self.Tabs) * 0.2, 0)
+    TabButton.Size = UDim2.new(0.2, 0, 1, 0)
+    TabButton.Position = UDim2.new(#self.Tabs * 0.2, 0, 0, 0)
     TabButton.Font = Enum.Font.SourceSans
     TabButton.Text = tabName
     TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -53,10 +69,9 @@ function CustomLib:NewTab(tabName)
 
     local TabFrame = Instance.new("Frame")
     TabFrame.Name = tabName .. "TabFrame"
-    TabFrame.Parent = self.MainFrame
+    TabFrame.Parent = self.TabContentFrame
     TabFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    TabFrame.Position = UDim2.new(0, 0, 0.1, 0)
-    TabFrame.Size = UDim2.new(1, 0, 0.9, 0)
+    TabFrame.Size = UDim2.new(1, 0, 1, 0)
     TabFrame.Visible = false
 
     table.insert(self.Tabs, TabFrame)
@@ -117,7 +132,7 @@ function CustomLib:NewDropdown(tab, dropdownText, items, callback)
     DropdownList.BorderSizePixel = 0
     DropdownList.Position = UDim2.new(0, 0, 0.5, 0)
     DropdownList.Size = UDim2.new(1, 0, 0.5, 0)
-    DropdownList.CanvasSize = UDim2.new(0, 0, 5, 0)
+    DropdownList.CanvasSize = UDim2.new(0, 0, #items * 0.2, 0)
     DropdownList.ScrollBarThickness = 6
     DropdownList.Visible = false
 
@@ -150,7 +165,3 @@ function CustomLib:NewDropdown(tab, dropdownText, items, callback)
 end
 
 return CustomLib
-
--- حدث عند الضغط على زر الطرد
-kickButton.MouseButton1Click:Connect(kickPlayer)
-
