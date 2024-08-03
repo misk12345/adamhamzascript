@@ -1,123 +1,155 @@
-local Players = game:GetService("Players")
+-- Custom GUI Library
+local CustomLib = {}
+CustomLib.__index = CustomLib
 
--- إنشاء ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+function CustomLib:CreateWindow(title)
+    local ScreenGui = Instance.new("ScreenGui")
+    local MainFrame = Instance.new("Frame")
+    local Title = Instance.new("TextLabel")
 
--- إنشاء Frame
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 350, 0, 200)
-frame.Position = UDim2.new(0.5, -175, 0.5, -100)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.BorderSizePixel = 2
-frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
-frame.Draggable = true
-frame.Active = true
-frame.Selectable = true
-frame.Parent = screenGui
+    ScreenGui.Name = "CustomGUI"
+    ScreenGui.Parent = game.CoreGui
 
--- إنشاء عنوان
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(0, 300, 0, 30)
-titleLabel.Position = UDim2.new(0.5, -150, 0, 10)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "طرد اللاعب"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextSize = 24
-titleLabel.Parent = frame
+    MainFrame.Name = "MainFrame"
+    MainFrame.Parent = ScreenGui
+    MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
+    MainFrame.Size = UDim2.new(0.4, 0, 0.4, 0)
 
--- إنشاء زر الإغلاق
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -35, 0, 5)
-closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.Font = Enum.Font.SourceSansBold
-closeButton.TextSize = 20
-closeButton.Text = "X"
-closeButton.Parent = frame
+    Title.Name = "Title"
+    Title.Parent = MainFrame
+    Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    Title.BorderSizePixel = 0
+    Title.Size = UDim2.new(1, 0, 0.1, 0)
+    Title.Font = Enum.Font.SourceSans
+    Title.Text = title
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextScaled = true
+    Title.TextSize = 14
+    Title.TextWrapped = true
 
--- حدث عند الضغط على زر الإغلاق
-closeButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy()
-end)
+    local window = {}
+    setmetatable(window, CustomLib)
+    window.ScreenGui = ScreenGui
+    window.MainFrame = MainFrame
+    window.Tabs = {}
+    return window
+end
 
--- إنشاء Dropdown Menu
-local playerDropdown = Instance.new("TextButton")
-playerDropdown.Size = UDim2.new(0, 300, 0, 50)
-playerDropdown.Position = UDim2.new(0.5, -150, 0, 50)
-playerDropdown.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-playerDropdown.TextColor3 = Color3.fromRGB(255, 255, 255)
-playerDropdown.Font = Enum.Font.SourceSans
-playerDropdown.TextSize = 20
-playerDropdown.Text = "اختر اللاعب"
-playerDropdown.Parent = frame
+function CustomLib:NewTab(tabName)
+    local TabButton = Instance.new("TextButton")
+    TabButton.Name = tabName .. "TabButton"
+    TabButton.Parent = self.MainFrame
+    TabButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    TabButton.Size = UDim2.new(0.2, 0, 0.1, 0)
+    TabButton.Position = UDim2.new(0, (#self.Tabs) * 0.2, 0)
+    TabButton.Font = Enum.Font.SourceSans
+    TabButton.Text = tabName
+    TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TabButton.TextScaled = true
+    TabButton.TextSize = 14
+    TabButton.TextWrapped = true
 
-local dropdownFrame = Instance.new("Frame")
-dropdownFrame.Size = UDim2.new(0, 300, 0, 150)
-dropdownFrame.Position = UDim2.new(0.5, -150, 0, 100)
-dropdownFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-dropdownFrame.Visible = false
-dropdownFrame.Parent = frame
+    local TabFrame = Instance.new("Frame")
+    TabFrame.Name = tabName .. "TabFrame"
+    TabFrame.Parent = self.MainFrame
+    TabFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    TabFrame.Position = UDim2.new(0, 0, 0.1, 0)
+    TabFrame.Size = UDim2.new(1, 0, 0.9, 0)
+    TabFrame.Visible = false
 
-local function updateDropdown()
-    for _, child in ipairs(dropdownFrame:GetChildren()) do
-        if child:IsA("TextButton") then
-            child:Destroy()
+    table.insert(self.Tabs, TabFrame)
+
+    TabButton.MouseButton1Click:Connect(function()
+        for _, tab in pairs(self.Tabs) do
+            tab.Visible = false
         end
-    end
+        TabFrame.Visible = true
+    end)
 
-    local players = Players:GetPlayers()
-    for i, player in ipairs(players) do
-        local button = Instance.new("TextButton")
-        button.Size = UDim2.new(1, 0, 0, 30)
-        button.Position = UDim2.new(0, 0, 0, (i - 1) * 30)
-        button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        button.TextColor3 = Color3.fromRGB(255, 255, 255)
-        button.Font = Enum.Font.SourceSans
-        button.TextSize = 20
-        button.Text = player.Name
-        button.Parent = dropdownFrame
+    return TabFrame
+end
 
-        button.MouseButton1Click:Connect(function()
-            playerDropdown.Text = player.Name
-            dropdownFrame.Visible = false
+function CustomLib:NewButton(tab, buttonText, callback)
+    local Button = Instance.new("TextButton")
+    Button.Name = buttonText .. "Button"
+    Button.Parent = tab
+    Button.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+    Button.Size = UDim2.new(0.9, 0, 0.1, 0)
+    Button.Position = UDim2.new(0.05, 0, (#tab:GetChildren() - 1) * 0.12, 0)
+    Button.Font = Enum.Font.SourceSans
+    Button.Text = buttonText
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.TextScaled = true
+    Button.TextSize = 14
+    Button.TextWrapped = true
+
+    Button.MouseButton1Click:Connect(callback)
+end
+
+function CustomLib:NewDropdown(tab, dropdownText, items, callback)
+    local DropdownFrame = Instance.new("Frame")
+    local DropdownButton = Instance.new("TextButton")
+    local DropdownList = Instance.new("ScrollingFrame")
+    local UIListLayout = Instance.new("UIListLayout")
+
+    DropdownFrame.Name = dropdownText .. "DropdownFrame"
+    DropdownFrame.Parent = tab
+    DropdownFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    DropdownFrame.Size = UDim2.new(0.9, 0, 0.2, 0)
+    DropdownFrame.Position = UDim2.new(0.05, 0, (#tab:GetChildren() - 1) * 0.22, 0)
+
+    DropdownButton.Name = dropdownText .. "DropdownButton"
+    DropdownButton.Parent = DropdownFrame
+    DropdownButton.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+    DropdownButton.Size = UDim2.new(1, 0, 0.5, 0)
+    DropdownButton.Font = Enum.Font.SourceSans
+    DropdownButton.Text = dropdownText
+    DropdownButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    DropdownButton.TextScaled = true
+    DropdownButton.TextSize = 14
+    DropdownButton.TextWrapped = true
+
+    DropdownList.Name = dropdownText .. "DropdownList"
+    DropdownList.Parent = DropdownFrame
+    DropdownList.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+    DropdownList.BorderSizePixel = 0
+    DropdownList.Position = UDim2.new(0, 0, 0.5, 0)
+    DropdownList.Size = UDim2.new(1, 0, 0.5, 0)
+    DropdownList.CanvasSize = UDim2.new(0, 0, 5, 0)
+    DropdownList.ScrollBarThickness = 6
+    DropdownList.Visible = false
+
+    UIListLayout.Parent = DropdownList
+    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    DropdownButton.MouseButton1Click:Connect(function()
+        DropdownList.Visible = not DropdownList.Visible
+    end)
+
+    for _, item in pairs(items) do
+        local ItemButton = Instance.new("TextButton")
+        ItemButton.Name = item .. "Button"
+        ItemButton.Parent = DropdownList
+        ItemButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        ItemButton.Size = UDim2.new(1, 0, 0.2, 0)
+        ItemButton.Font = Enum.Font.SourceSans
+        ItemButton.Text = item
+        ItemButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        ItemButton.TextScaled = true
+        ItemButton.TextSize = 14
+        ItemButton.TextWrapped = true
+
+        ItemButton.MouseButton1Click:Connect(function()
+            callback(item)
+            DropdownButton.Text = dropdownText .. ": " .. item
+            DropdownList.Visible = false
         end)
     end
 end
 
-playerDropdown.MouseButton1Click:Connect(function()
-    dropdownFrame.Visible = not dropdownFrame.Visible
-    updateDropdown()
-end)
-
--- إنشاء Button لطرد اللاعب
-local kickButton = Instance.new("TextButton")
-kickButton.Size = UDim2.new(0, 300, 0, 40)
-kickButton.Position = UDim2.new(0.5, -150, 0, 160)
-kickButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-kickButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-kickButton.Font = Enum.Font.SourceSansBold
-kickButton.TextSize = 20
-kickButton.Text = "طرد اللاعب"
-kickButton.Parent = frame
-
--- وظيفة الطرد
-local function kickPlayer()
-    local playerName = playerDropdown.Text
-    if playerName == "اختر اللاعب" then
-        print("الرجاء اختيار اللاعب")
-        return
-    end
-    local playerToKick = Players:FindFirstChild(playerName)
-    
-    if playerToKick then
-        playerToKick:Kick("لقد تم طردك من اللعبة.")
-    else
-        print("اللاعب غير موجود")
-    end
-end
+return CustomLib
 
 -- حدث عند الضغط على زر الطرد
 kickButton.MouseButton1Click:Connect(kickPlayer)
